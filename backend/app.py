@@ -37,8 +37,9 @@ def extract():
         result = extract_text_from_s3(local_path, s3_key)
 
         # Cache for Q&A
-        global extracted_text_cache
+        global extracted_text_cache, extracted_tables_cache
         extracted_text_cache = "\n".join(result['lines'])
+        extracted_tables_cache = result['tables']
 
         return jsonify(result)
     except Exception as e:
@@ -53,7 +54,7 @@ def ask():
         return jsonify({'answer': 'No text has been extracted yet.'}), 400
 
     try:
-        answer = answer_question(question, extracted_text_cache)
+        answer = answer_question(question, extracted_text_cache, extracted_tables_cache)
         return jsonify({'answer': answer})
     except Exception as e:
         return jsonify({'answer': f'Error: {str(e)}'}), 500
